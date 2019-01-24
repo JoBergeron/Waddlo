@@ -1,8 +1,8 @@
-def SideDefsString():
-    return "SIDEDEFS"
+def SideDefs(): return b"SIDEDEFS"
+def TextureMarkerStart(): return b"TX_START"
+def TextureMarkerEnd(): return b"TX_END\x00\x00"
 
-def GetInt32(x):
-    return int.from_bytes(x, byteorder = 'little', signed = False)
+def GetInt32(x): return int.from_bytes(x, byteorder = 'little', signed = False)
 
 def GetFileSize(file):
     x = 0
@@ -30,6 +30,8 @@ class Header:
 class Lump:
     def __init__(self, location, length, name, file):
         self.name = name
+        self.location = location
+        self.length = length
         file.seek(location)
         self.data = file.read(length)
 
@@ -61,7 +63,7 @@ class Wad:
     def GetSize(self): return GetFileSize(self.wadFile)
     def GetNbLumps(self): return len(self.lumps)
 
-    def GetSideDefsLump(self):
+    def GetLump(self, name):
         for lump in self.lumps:
-            if lump.name.decode("UTF-8") == SideDefsString():
+            if lump.name == name:
                 return lump
