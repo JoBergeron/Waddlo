@@ -28,12 +28,15 @@ class Header:
         print("Location of directory: " + str(self.GetDirectoryLocationInt32()))
 
 class Lump:
-    def __init__(self, location, length, name, file):
+    def __init__(self, name, location = 0, length = 0, file = None):
         self.name = name
-        self.location = location
-        self.length = length
-        file.seek(location)
-        self.data = file.read(length)
+        #self.location = location
+        #self.length = length
+        if file is not None:
+            file.seek(location)
+            self.data = file.read(length)
+        else:
+            self.data = 0
 
 class Wad:
     def __init__(self, path):
@@ -51,12 +54,10 @@ class Wad:
             lumpLength = GetInt32(self.wadFile.read(4))
             lumpName = self.wadFile.read(8)
             
-            lump = Lump(lumpLocation, lumpLength, lumpName, self.wadFile)
+            lump = Lump(lumpName, lumpLocation, lumpLength, self.wadFile)
             self.lumps.append(lump)
-            
             currentLocation += 16
 
-    
     def __del__(self):
         self.wadFile.close()
 
@@ -67,3 +68,10 @@ class Wad:
         for lump in self.lumps:
             if lump.name == name:
                 return lump
+
+    def GetLumpIndex(self, name):
+        x = 0
+        for lump in self.lumps:
+            if lump.name == name:
+                return x
+        return -1

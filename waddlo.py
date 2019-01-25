@@ -10,6 +10,5 @@ print("=============")
 textureNames = impl.GetTextureNamesFromWad(path, mapwad)
 print("=============")
 textureLumps = impl.GetTextureLumpsFromTexWad(path, texwad, textureNames)
-
-shutil.copyfile(path + mapwad, path + mergedwad)
 print("=============")
+impl.AddTexturesToWad(path, mapwad, mergedwad, textureLumps)

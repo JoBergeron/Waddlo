@@ -56,31 +56,51 @@ def GetTextureLumpsFromTexWad(path, texWadName, textureNames):
     texWad.header.Print()
 
     for texName in textureNames:
-        texNameUTF8 = texName.decode("UTF-8")
         lump = texWad.GetLump(texName)
         if lump is not None:
             texLumps.append(lump)
-            print("getting data for: " + texNameUTF8)
+            print("getting data for: " + texName.decode("UTF-8"))
 
-    texStart = texWad.GetLump(utils.TextureMarkerStart())
-    print("start marker location: " + str(texStart.location))
-    print("start marker size: " + str(texStart.length))
+#    texStart = texWad.GetLump(utils.TextureMarkerStart())
+#    print("start marker location: " + str(texStart.location))
+#    print("start marker size: " + str(texStart.length))
 
 
-    texEnd = texWad.GetLump(utils.TextureMarkerEnd())
-    print("end marker location: " + str(texEnd.location))
-    print("end marker size: " + str(texEnd.length))
+#    texEnd = texWad.GetLump(utils.TextureMarkerEnd())
+#    print("end marker location: " + str(texEnd.location))
+#    print("end marker size: " + str(texEnd.length))
 
     return texLumps
 
 
-def AddTexturesToWad(path, wadName, textureLumps):
+def AddTexturesToWad(path, source, destination, textureLumps):
 
-    wad = utils.Wad(path + wadName)
-    if wad is None:
+    sourceWad = utils.Wad(path + source)
+    if sourceWad is None:
         return
 
-    print("Opened wad " + wadName)
-    wad.header.Print()
+    print("Opened wad " + source)
+    sourceWad.header.Print()
 
-    texStart = wad.GetLump(utils.TextureMarkerStart())
+    destFile = open(path + destination, 'wb')
+    if destFile is None:
+        return
+        
+    destFile.write(sourceWad.header.type) #pwad type
+    destFile.write((0).to_bytes(4, byteorder = "little", signed = False))
+    destFile.write((12).to_bytes(4, byteorder = "little", signed = False))
+
+    destFile.close()
+
+    
+#startTextureMarkerIndex = wad.GetLumpIndex(utils.TextureMarkerStart())
+#    if startTextureMarkerIndex == -1:
+#        texStartLump = utils.Lump(utils.TextureMarkerStart())
+#        wad.lumps.append(texStartLump)
+
+#    endTextureMarkerIndex = wad.GetLumpIndex(utils.TextureMarkerEnd())
+#    if endTextureMarkerIndex == -1:
+#        texEndLump = utils.Lump(utils.TextureMarkerEnd())
+#        wad.lumps.append(texEndLump)
+
+    
