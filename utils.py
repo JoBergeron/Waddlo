@@ -27,16 +27,16 @@ class Header:
         print("Number of lumps: " + str(self.GetNbLumpsInt32()))
         print("Location of directory: " + str(self.GetDirectoryLocationInt32()))
 
-class Lump:
-    def __init__(self, name, location = 0, length = 0, file = None):
+class DirectoryEntry:
+    def __init__(self, location, length, name):
         self.name = name
-        #self.location = location
-        #self.length = length
-        if file is not None:
-            file.seek(location)
-            self.data = file.read(length)
-        else:
-            self.data = 0
+        self.location = location
+        self.length = length
+
+class Lump:
+    def __init__(self, directoryEnt, data):
+        self.directoryEnt = directoryEnt
+        self.data = data
 
 class Wad:
     def __init__(self, path):
@@ -49,12 +49,11 @@ class Wad:
         
         while currentLocation < self.fileSize:
             self.wadFile.seek(currentLocation)
+            directoryEnt = DirectoryEntry(GetInt32(self.wadFile.read(4)),  GetInt32(self.wadFile.read(4)), self.wadFile.read(8))
             
-            lumpLocation = GetInt32(self.wadFile.read(4))
-            lumpLength = GetInt32(self.wadFile.read(4))
-            lumpName = self.wadFile.read(8)
+            self.wadFile.seek(directoryEnt.location)
+            lump = Lump(directoryEnt, self.wadFile.read(directoryEnt.length))
             
-            lump = Lump(lumpName, lumpLocation, lumpLength, self.wadFile)
             self.lumps.append(lump)
             currentLocation += 16
 
@@ -66,12 +65,12 @@ class Wad:
 
     def GetLump(self, name):
         for lump in self.lumps:
-            if lump.name == name:
+            if lump.directoryEnt.name == name:
                 return lump
 
     def GetLumpIndex(self, name):
         x = 0
         for lump in self.lumps:
-            if lump.name == name:
+            if lump.directoryEnt.name == name:
                 return x
         return -1

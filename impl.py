@@ -86,9 +86,11 @@ def AddTexturesToWad(path, source, destination, textureLumps):
     if destFile is None:
         return
         
-    destFile.write(sourceWad.header.type) #pwad type
+    destFile.write(sourceWad.header.type) #wad type
     destFile.write((0).to_bytes(4, byteorder = "little", signed = False))
     destFile.write((12).to_bytes(4, byteorder = "little", signed = False))
+
+    
 
     destFile.close()
 
