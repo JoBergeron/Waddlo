@@ -82,7 +82,7 @@ def AddTexturesToWad(path, source, destination, textureLumps):
     print("Opened wad " + source)
     sourceWad.header.Print()
 
-    destFile = open(path + destination, 'wb')
+    destFile = open(path + destination, 'r+b')
     if destFile is None:
         return
         
@@ -90,19 +90,48 @@ def AddTexturesToWad(path, source, destination, textureLumps):
     destFile.write((0).to_bytes(4, byteorder = "little", signed = False))
     destFile.write((12).to_bytes(4, byteorder = "little", signed = False))
 
-    
+    startTextureMarkerIndex = sourceWad.GetLumpIndex(utils.TextureMarkerStart())
+    if startTextureMarkerIndex == -1:
+        startTxDirectoryEntry = utils.DirectoryEntry(0, 0, utils.TextureMarkerStart())
+        texStartLump = utils.Lump(startTxDirectoryEntry, b'')
+        sourceWad.lumps.append(texStartLump)
+
+    endTextureMarkerIndex = sourceWad.GetLumpIndex(utils.TextureMarkerEnd())
+    if endTextureMarkerIndex == -1:
+        endTxDirectoryEntry = utils.DirectoryEntry(0, 0, utils.TextureMarkerEnd())
+        texEndLump = utils.Lump(endTxDirectoryEntry, b'')
+        sourceWad.lumps.append(texEndLump)
+
+    for texLump in textureLumps:
+        if sourceWad.GetLump(texLump.directoryEnt.name) is None:
+            endTextureMarkerIndex = sourceWad.GetLumpIndex(utils.TextureMarkerEnd())
+            sourceWad.lumps.insert(endTextureMarkerIndex, texLump)
+            print("Adding lump: " + str(texLump.directoryEnt.name) + " at index: " + str(endTextureMarkerIndex))
+
+    # write data + update location in directory entries
+    for lump in sourceWad.lumps:
+        lump.directoryEnt.location = destFile.tell()
+        destFile.write(lump.data)
+
+    directoryStart = destFile.tell().to_bytes(4, byteorder = "little", signed = False)
+
+    # write directory entries
+    for lump in sourceWad.lumps:
+        dirEnt = lump.directoryEnt
+        destFile.write(dirEnt.location.to_bytes(4, byteorder = "little", signed = False))
+        destFile.write(dirEnt.length.to_bytes(4, byteorder = "little", signed = False))
+        destFile.write(dirEnt.name)
+
+    #update wad header
+    destFile.seek(4)
+    destFile.write(len(sourceWad.lumps).to_bytes(4, byteorder = "little", signed = False))
+    destFile.write(directoryStart)
 
     destFile.close()
 
     
-#startTextureMarkerIndex = wad.GetLumpIndex(utils.TextureMarkerStart())
-#    if startTextureMarkerIndex == -1:
-#        texStartLump = utils.Lump(utils.TextureMarkerStart())
-#        wad.lumps.append(texStartLump)
 
-#    endTextureMarkerIndex = wad.GetLumpIndex(utils.TextureMarkerEnd())
-#    if endTextureMarkerIndex == -1:
-#        texEndLump = utils.Lump(utils.TextureMarkerEnd())
-#        wad.lumps.append(texEndLump)
+
+
 
     

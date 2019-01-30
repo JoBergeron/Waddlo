@@ -67,10 +67,12 @@ class Wad:
         for lump in self.lumps:
             if lump.directoryEnt.name == name:
                 return lump
+        return None
 
     def GetLumpIndex(self, name):
         x = 0
         for lump in self.lumps:
             if lump.directoryEnt.name == name:
                 return x
+            x += 1
         return -1
