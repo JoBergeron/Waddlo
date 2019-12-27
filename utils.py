@@ -2,6 +2,8 @@ def SideDefs(): return b"SIDEDEFS"
 def TextureMarkerStart(): return b"TX_START"
 def TextureMarkerEnd(): return b"TX_END\x00\x00"
 
+def Sectors(): return b"SECTORS\x00"
+
 def GetInt32(x): return int.from_bytes(x, byteorder = 'little', signed = False)
 
 def GetFileSize(file):

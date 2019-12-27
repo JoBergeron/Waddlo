@@ -2,9 +2,9 @@ import impl
 import shutil
 
 path   = "/Users/jonathan/Waddlo/"
-mapwad = "Solace_Of_Solstice.wad"
-texwad = "jom5_snowtex_zdoom.wad"
-mergedwad = "SolaceOfSolsticeV2.wad"
+mapwad = "Refinery.wad"
+texwad = "cc4-tex.wad"
+mergedwad = "RefineryV2.wad"
 
 print("=============")
 textureNames = impl.GetTextureNamesFromWad(path, mapwad)

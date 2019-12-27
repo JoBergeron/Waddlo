@@ -72,7 +72,6 @@ def GetTextureLumpsFromTexWad(path, texWadName, textureNames):
 
     return texLumps
 
-
 def AddTexturesToWad(path, source, destination, textureLumps):
 
     sourceWad = utils.Wad(path + source)
@@ -82,7 +81,7 @@ def AddTexturesToWad(path, source, destination, textureLumps):
     print("Opened wad " + source)
     sourceWad.header.Print()
 
-    destFile = open(path + destination, 'r+b')
+    destFile = open(path + destination, 'w+b')
     if destFile is None:
         return
         
