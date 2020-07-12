@@ -1,6 +1,10 @@
 def SideDefs(): return b"SIDEDEFS"
-def TextureMarkerStart(): return b"TX_START"
-def TextureMarkerEnd(): return b"TX_END\x00\x00"
+
+def GraphicMarkerStart(): return b"PP_START"
+def GraphicMarkerEnd(): return b"PP_END\x00\x00"
+
+def GraphicMarkerStart2(): return b"P_START\x00"
+def GraphicMarkerEnd2(): return b"P_END\x00\x00\x00"
 
 def Sectors(): return b"SECTORS\x00"
 
@@ -78,3 +82,30 @@ class Wad:
                 return x
             x += 1
         return -1
+
+    def GetLumpsWithTag(self, tag):
+        lumps = []
+        for lump in self.lumps:
+            if lump.directoryEnt.name == tag:
+                lumps.append(lump)
+        return lumps
+
+    def GetLumpsBetweenTags(self, tagStart, tagEnd):
+        indexStart = self.GetLumpIndex(tagStart)
+        if indexStart == -1:
+            return None
+        indexEnd = self.GetLumpIndex(tagEnd)
+        if indexEnd == -1:
+            return None
+        return self.lumps[indexStart + 1: indexEnd]
+
+
+#shortcuts
+
+    def GetSideDefLumps(self): return self.GetLumpsWithTag(SideDefs())
+
+    def GetGraphicLumps(self):
+        lumps = self.GetLumpsBetweenTags(GraphicMarkerStart(), GraphicMarkerEnd())
+        if lumps is None:
+            lumps = self.GetLumpsBetweenTags(GraphicMarkerStart2(), GraphicMarkerEnd2())
+        return lumps
